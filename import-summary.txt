@@ -1,0 +1,97 @@
+ECLIPSE ANDROID PROJECT IMPORT SUMMARY
+======================================
+
+Ignored Files:
+--------------
+The following files were *not* copied into the new Gradle project; you
+should evaluate whether these are still needed in your project and if
+so manually move them:
+
+From AndroidFramework:
+* ic_launcher-web.png
+* proguard-project.txt
+From appcompat_v7:
+* .DS_Store
+
+Replaced Jars with Dependencies:
+--------------------------------
+The importer recognized the following .jar files as third party
+libraries and replaced them with Gradle dependencies instead. This has
+the advantage that more explicit version information is known, and the
+libraries can be updated automatically. However, it is possible that
+the .jar file in your project was of an older version than the
+dependency we picked, which could render the project not compileable.
+You can disable the jar replacement in the import wizard and try again:
+
+android-support-v4.jar => com.android.support:support-v4:20.+
+
+Moved Files:
+------------
+Android Gradle projects use a different directory structure than ADT
+Eclipse projects. Here's how the projects were restructured:
+
+In appcompat_v7:
+* src/ => appcompat_v7/src/main/java
+In AndroidFramework:
+* AndroidManifest.xml => androidFramework/src/main/AndroidManifest.xml
+* assets/ => androidFramework/src/main/assets/
+* libs/BaiduLBS_Android.jar => androidFramework/libs/BaiduLBS_Android.jar
+* libs/Java-WebSocket-1.3.1-SNAPSHOT.jar => androidFramework/libs/Java-WebSocket-1.3.1-SNAPSHOT.jar
+* libs/UPPayAssistEx.jar => androidFramework/libs/UPPayAssistEx.jar
+* libs/UPPayPluginExPro.jar => androidFramework/libs/UPPayPluginExPro.jar
+* libs/alipaysdk.jar => androidFramework/libs/alipaysdk.jar
+* libs/alipaysecsdk.jar => androidFramework/libs/alipaysecsdk.jar
+* libs/alipayutdid.jar => androidFramework/libs/alipayutdid.jar
+* libs/android_api_1.1_forsdk.jar => androidFramework/libs/android_api_1.1_forsdk.jar
+* libs/armeabi-v7a/libentryexpro.so => androidFramework/src/main/jniLibs/armeabi-v7a/libentryexpro.so
+* libs/armeabi/libBaiduMapSDK_v3_3_0_15.so => androidFramework/src/main/jniLibs/armeabi/libBaiduMapSDK_v3_3_0_15.so
+* libs/armeabi/libapp_BaiduNaviApplib_v1_0_0.so => androidFramework/src/main/jniLibs/armeabi/libapp_BaiduNaviApplib_v1_0_0.so
+* libs/armeabi/libapp_BaiduPanoApplib.so => androidFramework/src/main/jniLibs/armeabi/libapp_BaiduPanoApplib.so
+* libs/armeabi/libentryexpro.so => androidFramework/src/main/jniLibs/armeabi/libentryexpro.so
+* libs/armeabi/liblocSDK5.so => androidFramework/src/main/jniLibs/armeabi/liblocSDK5.so
+* libs/armeabi/liblocnaviSDK.so => androidFramework/src/main/jniLibs/armeabi/liblocnaviSDK.so
+* libs/asmack-android-6.jar => androidFramework/libs/asmack-android-6.jar
+* libs/commons-codec-1.9.jar => androidFramework/libs/commons-codec-1.9.jar
+* libs/galaxy_mini.jar => androidFramework/libs/galaxy_mini.jar
+* libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar => androidFramework/libs/ksoap2-android-assembly-3.0.0-jar-with-dependencies.jar
+* libs/libammsdk.jar => androidFramework/libs/libammsdk.jar
+* libs/mips/libentryexpro.so => androidFramework/src/main/jniLibs/mips/libentryexpro.so
+* libs/nineoldandroids-2.4.0.jar => androidFramework/libs/nineoldandroids-2.4.0.jar
+* libs/volley.jar => androidFramework/libs/volley.jar
+* libs/x86/libentryexpro.so => androidFramework/src/main/jniLibs/x86/libentryexpro.so
+* libs/zxing.jar => androidFramework/libs/zxing.jar
+* res/ => androidFramework/src/main/res/
+* src/ => androidFramework/src/main/java/
+* mm_title_back_focused.9.PNG => mm_title_back_focused.9.png
+* mm_title_back_normal.9.PNG => mm_title_back_normal.9.png
+* mm_title_back_pressed.9.PNG => mm_title_back_pressed.9.png
+* mmtitle_bg_alpha.9.PNG => mmtitle_bg_alpha.9.png
+
+Missing Android Support Repository:
+-----------------------------------
+Some useful libraries, such as the Android Support Library, are
+installed from a special Maven repository, which should be installed
+via the SDK manager.
+
+It looks like this library is missing from your SDK installation at:
+null
+
+To install it, open the SDK manager, and in the Extras category,
+select "Android Support Repository". You may also want to install the
+"Google Repository" if you want to use libraries like Google Play
+Services.
+
+Next Steps:
+-----------
+You can now build the project. The Gradle project needs network
+connectivity to download dependencies.
+
+Bugs:
+-----
+If for some reason your project does not build, and you determine that
+it is due to a bug or limitation of the Eclipse to Gradle importer,
+please file a bug at http://b.android.com with category
+Component-Tools.
+
+(This import summary is for your information only, and can be deleted
+after import once you are satisfied with the results.)

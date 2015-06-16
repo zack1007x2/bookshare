@@ -1,0 +1,56 @@
+<resources>
+
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">6dp</dimen>
+    <dimen name="activity_vertical_margin">6dp</dimen>
+    
+    <dimen name="slidingmenu_offset">45dp</dimen>
+    <dimen name="shadow_width">11dp</dimen>
+    
+	<!-- 顶部和底部栏高度 -->
+	<dimen name="custom_title_height">38dip</dimen>
+	<dimen name="custom_navi_height">41dip</dimen>
+	
+	<!-- 自定义标题栏高度 -->
+	<dimen name="custom_left_menu_margin">15dip</dimen>
+	<dimen name="custom_left_menu_item_height">34dip</dimen>
+	
+    <!-- 自定义对话框模式Activity布局属性 -->
+    <dimen name="custom_ad_btn_height">34dp</dimen>
+    <dimen name="custom_ad_btn_margin_height">38dp</dimen>
+    <dimen name="custom_ad_btn_negative_height">-34dp</dimen>
+    <dimen name="custom_ad_padding">68dip</dimen>
+    <dimen name="custom_ad_single_list_item_height">34dp</dimen>
+    <dimen name="update_img_merginten">8dp</dimen>
+    <dimen name="update_img_mergineighteen">14dp</dimen>
+    
+    
+    <dimen name="update_img">100dp</dimen>
+    <dimen name="update_img_mergin">15dp</dimen>
+    <dimen name="update_img_merginthirty">22dp</dimen>
+    <dimen name="update_Name_merginTop">30dp</dimen>
+    <dimen name="update_img_merginTop">15dp</dimen>
+    <dimen name="update_img_merginTopi">15dip</dimen>
+    <dimen name="update_tvAnno_mergin">10dp</dimen>
+    <dimen name="update_btn_hight">40dp</dimen>
+    <dimen name="login_text_width_twenty_six">20dp</dimen>
+    
+    <dimen name="text_size_s">12sp</dimen>
+    <dimen name="text_size_m">15sp</dimen>
+    <dimen name="text_size_l">17sp</dimen>
+    <dimen name="text_size_xl">21sp</dimen>
+    
+    <dimen name="login_text_width">113dp</dimen>
+    <dimen name="slidingmenu_layout_width">50dp</dimen>
+    <dimen name="list_img_width">60dp</dimen>
+    
+    
+    <dimen name="title">13dp</dimen>
+    <dimen name="rating">11dip</dimen>
+    <dimen name="genre">10dip</dimen>
+    <dimen name="year">9dip</dimen>
+    
+    
+    <dimen name="standard_padding">8dip</dimen>
+  	<dimen name="half_padding">4dip</dimen>
+</resources>

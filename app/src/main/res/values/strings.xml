@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">bookshare</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="tab_shelf">shelf</string>
+    <string name="tab_wish">wish list</string>
+    <string name="tab_scan">ISBN</string>
+    <string name="tab_timeline">timeline</string>
+    <string name="tab_explore">explore</string>
+    
+</resources>
