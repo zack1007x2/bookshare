@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.SparseArray;
 import android.view.View;
 
-import com.example.zack.bookshare.Util.MyLog;
+import com.example.zack.Util.MyLog;
 
 
 public class MainActivity extends FragmentActivity implements View.OnClickListener {
@@ -24,7 +24,6 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initFragment();
-        Log.d("onCreate");
 
     }
 
@@ -77,6 +76,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     @Override
     public void onClick(View view) {
         int id = view.getId();
+
         if (navigateMap.indexOfKey(id) >= 0) {
 
             if (!view.isSelected()) {

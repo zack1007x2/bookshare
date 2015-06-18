@@ -3,11 +3,10 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="@dimen/slidingmenu_offset"
+    android:layout_height="@dimen/size_48"
     android:layout_alignParentBottom="true"
     android:layout_centerHorizontal="true"
     android:gravity="bottom"
-
     android:orientation="horizontal"
     >
 
@@ -15,15 +14,15 @@
     <LinearLayout
         android:id="@+id/tab_shelf"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/custom_title_height"
+        android:layout_height="@dimen/size_42"
         android:layout_weight="1"
         android:background="#323331"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/update_img_merginthirty"
+            android:layout_height="@dimen/size_20"
             android:scaleType="centerInside"
             android:src="@drawable/read"
             />
@@ -32,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tab_shelf"
+            android:textSize="@dimen/text_size_s"
             android:textColor="@drawable/bottomtext"
             />
     </LinearLayout>
@@ -40,14 +40,14 @@
         android:id="@+id/tab_wish"
         android:layout_width="wrap_content"
         android:background="#323331"
-        android:layout_height="@dimen/custom_title_height"
+        android:layout_height="@dimen/size_42"
         android:layout_weight="1"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/update_img_merginthirty"
+            android:layout_height="@dimen/size_20"
             android:scaleType="centerInside"
             android:src="@drawable/read"
             />
@@ -56,6 +56,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tab_wish"
+            android:textSize="@dimen/text_size_s"
             android:textColor="@drawable/bottomtext"
             />
     </LinearLayout>
@@ -66,12 +67,12 @@
         android:layout_height="match_parent"
         android:layout_weight="0.8"
         android:background="@drawable/corner"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/update_img_merginthirty"
+            android:layout_height="@dimen/size_24"
             android:scaleType="centerInside"
             android:src="@drawable/read"
             />
@@ -80,6 +81,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tab_scan"
+            android:textSize="@dimen/text_size_s"
             android:textColor="@drawable/bottomtext"
             />
     </LinearLayout>
@@ -88,14 +90,14 @@
         android:id="@+id/tab_explore"
         android:layout_width="wrap_content"
         android:background="#323331"
-        android:layout_height="@dimen/custom_title_height"
+        android:layout_height="@dimen/size_42"
         android:layout_weight="1"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/update_img_merginthirty"
+            android:layout_height="@dimen/size_20"
             android:scaleType="centerInside"
             android:src="@drawable/read"
             />
@@ -104,6 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tab_explore"
+            android:textSize="@dimen/text_size_s"
             android:textColor="@drawable/bottomtext"
             />
     </LinearLayout>
@@ -111,15 +114,15 @@
     <LinearLayout
         android:id="@+id/tab_timeline"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/custom_title_height"
+        android:layout_height="@dimen/size_42"
         android:layout_weight="1"
         android:background="#323331"
-        android:gravity="bottom|center_horizontal"
+        android:gravity="center"
         android:orientation="vertical">
 
         <ImageView
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/update_img_merginthirty"
+            android:layout_height="@dimen/size_20"
             android:scaleType="centerInside"
             android:src="@drawable/read"
             />
@@ -128,6 +131,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/tab_timeline"
+            android:textSize="@dimen/text_size_s"
             android:textColor="@drawable/bottomtext"
             />
     </LinearLayout>

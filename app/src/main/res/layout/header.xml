@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/RelativeLayout1"
-    android:layout_width="fill_parent"
-    android:layout_height="@dimen/custom_navi_height"
-    android:background="#44bbaa"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingLeft="5dip" 
-    android:paddingRight="5dip">
-    
+<RelativeLayout android:id="@+id/RelativeLayout1"
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/size_35"
+                android:background="#44bbaa"
+                android:elevation="5dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dip">
+
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="@dimen/custom_title_height"
-        android:layout_height="@dimen/custom_title_height"
+        android:layout_width="@dimen/size_32"
+        android:layout_height="@dimen/size_32"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:visibility="gone"
-        android:src="@android:drawable/ic_dialog_dialer" />
+        android:src="@mipmap/ic_launcher"
+        />
 
     <TextView
         android:id="@+id/tvTitle"
@@ -28,8 +29,7 @@
         android:layout_toRightOf="@+id/icon"
         android:text="墨客"
         android:textColor="#ffffff"
-        android:textSize="@dimen/text_size_xl" />
-
+        android:textSize="@dimen/text_size_xl"/>
 
 
 </RelativeLayout>

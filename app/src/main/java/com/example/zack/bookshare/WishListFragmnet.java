@@ -12,7 +12,7 @@ public class WishListFragmnet extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_shelf, container, false);
+        View view = inflater.inflate(R.layout.fragment_wishlist, container, false);
 
         return view;
     }
