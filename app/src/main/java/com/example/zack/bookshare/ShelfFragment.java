@@ -115,6 +115,7 @@ public class ShelfFragment extends BaseFragment implements View.OnClickListener 
                     Intent intent = new Intent();
                     intent.putExtra("DeviceName", mBluetoothDevice.getName());
                     intent.putExtra("DeviceAddress", mBluetoothDevice.getAddress());
+                    intent.putExtra("Device",mBluetoothDevice);
                     intent.setClass(getActivity(), LockControlActivity.class);
                     getActivity().startActivity(intent);
 

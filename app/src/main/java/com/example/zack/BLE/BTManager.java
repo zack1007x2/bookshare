@@ -36,7 +36,7 @@ public class BTManager {
         this.listener = listener;
     }
     /**
-     * 打開藍牙
+     * open bluetooth
      */
     public void openBluetooth(){
         if (adapter == null){
@@ -50,7 +50,7 @@ public class BTManager {
         }
     }
     /**
-     * 獲取已經配對的藍牙設備
+     * get paired bluetooth devices
      * @return
      */
     public Set<BluetoothDevice> getPairedBluetooth(){
@@ -58,7 +58,7 @@ public class BTManager {
         return devices;
     }
     /**
-     * 搜索周圍的藍牙設備
+     * search bluetooth device
      */
     public void seachBluetooth(){
         IntentFilter intentFilter = new IntentFilter();
@@ -70,7 +70,7 @@ public class BTManager {
         adapter.startDiscovery();
     }
     /**
-     * 連接到指定的藍牙設配
+     * connect to bluetooth divices
      * @param device
      * @throws Exception
      */
@@ -95,14 +95,14 @@ public class BTManager {
         public void seach(List<BluetoothDevice> devices);
     }
     /**
-     * 關閉本機的藍牙
+     * shut down bluetooth
      */
     public void closeBluetooth(){
         if(adapter != null && adapter.isEnabled())
             adapter.disable();
     }
     /**
-     * 發送數據到指定藍牙設配
+     * sent data to bluetooth devices
      * @param data
      * @throws IOException
      */
