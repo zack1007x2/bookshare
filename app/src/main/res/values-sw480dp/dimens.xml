@@ -45,6 +45,8 @@
     <dimen name="genre">13dip</dimen>
     <dimen name="year">12dip</dimen>
 
+    <dimen name="size_6_m">-8dp</dimen>
+
 
     <dimen name="size_1">1.3dp</dimen>
     <dimen name="size_2">2.7dp</dimen>

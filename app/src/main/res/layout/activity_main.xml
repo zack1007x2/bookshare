@@ -14,13 +14,22 @@
         android:id="@+id/contentframe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/header">
+        android:layout_below="@id/header"
+        android:layout_above="@+id/ll_block">
     </FrameLayout>
 
 
     <include
         android:id="@+id/footer_host"
         layout="@layout/bottom"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:id="@+id/ll_block"
+        android:layout_height="@dimen/size_42"
+        android:layout_alignParentBottom="true">
+    </LinearLayout>
 
 
 </RelativeLayout>

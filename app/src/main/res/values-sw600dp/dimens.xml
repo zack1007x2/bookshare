@@ -43,6 +43,8 @@
     <dimen name="genre">16dip</dimen>
     <dimen name="year">15dip</dimen>
 
+    <dimen name="size_6_m">-12dp</dimen>
+
     <dimen name="size_1">2dp</dimen>
     <dimen name="size_2">4.1dp</dimen>
     <dimen name="size_3">6dp</dimen>
