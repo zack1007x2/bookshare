@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
@@ -69,10 +70,24 @@ public class TimelineFragment extends BaseFragment {
         pd = new ProgressDialog(getActivity());
         pd.setMessage("載入中");
         pd.setCancelable(false);
+        lvNovel.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                Log.d("onScroll","firstVisibleItem = " +firstVisibleItem+"visibleItemCount = " +
+                        visibleItemCount+"totalItemCount ="+ totalItemCount);
+
+            }
+        });
         lvNovel.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                lvNovel.setSelection(200);
+                lvNovel.setSelection(236);
+//                Log.d("getSelectedItemPosition", "Position = "+lvNovel.getChildCount());
             }
         });
 
@@ -134,31 +149,45 @@ public class TimelineFragment extends BaseFragment {
                 if (bufferedReader.ready()) {
 
                     try {
-                        while ((numRead = bufferedReader.read()) >= 0) {
-                            isNextLine =((char) numRead=='\n');
 
-                            str = String.valueOf((char) numRead);
-
-                            if ((str != null)&& (str.toString() != "")) {
-                                sb.append(str);
-                                counter++;
-                                if(counter>3000){
-                                    if(isNextLine) {
-                                        ABC++;
-                                        articleList.add(sb.toString());
-                                        sb.setLength(0);
-                                        counter = 0;
-                                    }
-                                }
+                        String thisline = null;
+                        while((thisline = bufferedReader.readLine())!=null){
+                            articleList.add(thisline);
+                            if(thisline.contains("第") && thisline.contains("章") && thisline
+                                    .length()<20){
+                                Log.d("Zack",thisline);
                             }
-
                             if (!bufferedReader.ready()){
                                 //no more characters to read
-                                ABC++;
-                                articleList.add(sb.toString());
                                 break;
                             }
                         }
+
+//                        while ((numRead = bufferedReader.read()) >= 0) {
+//                            isNextLine =((char) numRead=='\n');
+//
+//                            str = String.valueOf((char) numRead);
+//
+//                            if ((str != null)&& (str.toString() != "")) {
+//                                sb.append(str);
+//                                counter++;
+//                                if(counter>20){
+//                                    if(isNextLine) {
+//                                        ABC++;
+//                                        articleList.add(sb.toString());
+//                                        sb.setLength(0);
+//                                        counter = 0;
+//                                    }
+//                                }
+//                            }
+//
+//                            if (!bufferedReader.ready()){
+//                                //no more characters to read
+//                                ABC++;
+//                                articleList.add(sb.toString());
+//                                break;
+//                            }
+//                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (Exception e) {
@@ -175,8 +204,5 @@ public class TimelineFragment extends BaseFragment {
             e.printStackTrace();
         }
     }
-
-
-
 
 }
