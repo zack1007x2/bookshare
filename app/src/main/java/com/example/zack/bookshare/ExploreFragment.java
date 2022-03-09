@@ -2,7 +2,6 @@ package com.example.zack.bookshare;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +14,12 @@ import com.example.zack.Quote.messageData;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 /**
  * Created by Zack on 15/6/16.
  */
-public class ExploreFragment extends BaseFragment implements
-        android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener {
+public class ExploreFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private ListView lvMessage;
     private ProgressBar progressbar;
