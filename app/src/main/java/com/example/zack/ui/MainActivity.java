@@ -1,10 +1,13 @@
 package com.example.zack.bookshare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseArray;
 import android.view.View;
 
 import com.example.zack.Util.MyLog;
+import com.example.zack.common.SocketServiceSP;
+import com.example.zack.core.SocketService;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -24,6 +27,12 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (!SocketServiceSP.getInstance(this).isSocketServiceStarted()) {
+            Intent serviceIntent = new Intent(this, SocketService.class);
+            startService(serviceIntent);
+        }
+
         initFragment();
 
     }
