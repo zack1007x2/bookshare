@@ -7,7 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.zack.bookshare.R;
+import com.example.zack.ui.R;
 
 import java.util.ArrayList;
 import java.util.List;

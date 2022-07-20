@@ -1,13 +1,11 @@
 // ISocketMessageListener.aidl
 package com.example.zack.ui;
 
+import com.example.zack.ui.bean.SocketMessage;
+
 // Declare any non-default types here with import statements
 
 interface ISocketMessageListener {
-    /**
-     * Demonstrates some basic types that you can use as parameters
-     * and return values in AIDL.
-     */
-    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
-            double aDouble, String aString);
+
+    void updateMessageList(out SocketMessage message);
 }
