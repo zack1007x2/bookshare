@@ -31,9 +31,12 @@ import com.example.zack.ui.R;
 import com.example.zack.ui.bean.SocketMessage;
 
 import java.lang.ref.WeakReference;
-import java.net.URI;
+import java.net.URISyntaxException;
 
 import androidx.core.app.NotificationCompat;
+import io.socket.client.IO;
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 /**
  * Created by HouBin on 2017/3/14.
@@ -44,7 +47,7 @@ public class SocketService extends Service {
     //Service实例，用于在Activity中进行连接断开发消息等图形界面化的操作
 
     //Socket的弱引用
-    private WeakReference<JWebSocketClient> mSocket;
+    private WeakReference<Socket> mSocket;
 
     //消息发出的时间（不管是心跳包还是普通消息，发送完就会跟新时间）
     private long sendTime = 0;
@@ -131,25 +134,54 @@ public class SocketService extends Service {
 
         if(isServerClose())
             connectSocket();
+
+        sendNormalNotification("Sotera");
+        startForeground(1, fore);
         return START_STICKY;//设置START_STICKY为了使服务被意外杀死后可以重启
     }
 
+
+    private Emitter.Listener onConnect = args -> {
+        Log.d("connected...");
+
+    };
+
+    private void restartSocket(){
+        new Handler().postDelayed(() -> {
+            if(!mSocket.get().connected()){
+                mSocket.get().connect();
+            }
+        },5000);
+    }
+
+    private Emitter.Listener onConnectError = args -> Log.d("Error onConnectError...");
+
+    private Emitter.Listener onDisconnect = args -> {
+        restartSocket();
+        Log.d("Error onDisconnect...");
+    };
+    private Emitter.Listener onMessage = args -> {
+        String a = "";
+        for (Object k:args) {
+            a += k.toString();
+        }
+        sendNormalNotification(a);
+    };
 
     /**
      * 客户端通过Socket与服务端建立连接
      */
     public void connectSocket() {
         new Thread(() -> {
-            URI uri = URI.create("ws://"+Custom.SERVER_HOST+":"+Custom.SERVER_PORT);
-            Log.d(uri.toString());
-            JWebSocketClient socket = new JWebSocketClient(uri){
-                @Override
-                public void onMessage(String message) {
-                    //message就是接收到的消息
-                    Log.e("JWebSClientService: "+ message);
-                    sendNormalNotification(message);
-                }
-            };
+//            URI uri = URI.create("http://"+Custom.SERVER_HOST+":"+Custom.SERVER_PORT);
+//            Log.d(uri.toString());
+            Socket socket = null;
+            try {
+                socket = IO.socket("http://10.40.246.23:9000");
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
                 NotificationChannel channel = new NotificationChannel(
@@ -158,15 +190,15 @@ public class SocketService extends Service {
                 assert manager != null;
                 manager.createNotificationChannel(channel);
             }
-
-            try {
-                socket.connectBlocking();
-                Log.d("Socket连接成功。。。。。。");
-                socket.send("hello");
-            } catch (InterruptedException e) {
-                Log.e("Socket连接失敗。。。。。。");
-            }
-//                Socket socket = new Socket(InetAddress.getByName(Custom.SERVER_HOST), Custom.SERVER_PORT);
+            socket.on(Socket.EVENT_CONNECT, onConnect);
+            socket.on(Socket.EVENT_DISCONNECT, onDisconnect);
+            socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
+            socket.on("message", onMessage);
+            socket.connect();
+            Log.d("Socket连接成功。。。。。。");
+            socket.send("hello");
+            socket.emit("message", "hello");
+            //                Socket socket = new Socket(InetAddress.getByName(Custom.SERVER_HOST), Custom.SERVER_PORT);
 //                socket.setSoTimeout(Custom.SOCKET_CONNECT_TIMEOUT * 1000);
 
             mSocket = new WeakReference<>(socket);
@@ -214,7 +246,7 @@ public class SocketService extends Service {
         if (mSocket == null || mSocket.get() == null) {
             return false;
         }
-        JWebSocketClient socket = mSocket.get();
+        Socket socket = mSocket.get();
         socket.send(Util.initJsonObject(message).toString());
 //        try {
 //            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -294,7 +326,7 @@ public class SocketService extends Service {
 
 
     //通知的ID，为了分开显示，需要根据Id区分
-    private int nId = 0;
+    private int nId = 2;
 
     /**
      * 收到时间消息，发送通知提醒
@@ -333,7 +365,7 @@ public class SocketService extends Service {
         manager.notify(nId, notification);
         nId++;
     }
-
+    Notification fore =null;
     private void sendNormalNotification(String message) {
         Log.e("sendNormalNotification");
         NotificationCompat.Builder builder
@@ -345,7 +377,8 @@ public class SocketService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setCategory(NotificationCompat.CATEGORY_MESSAGE);
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        manager.notify(nId, builder.build());
+        fore = builder.build();
+        manager.notify(nId, fore);
         nId++;
     }
 
@@ -354,10 +387,10 @@ public class SocketService extends Service {
      *
      * @param socket
      */
-    private void releaseLastSocket(WeakReference<JWebSocketClient> socket) {
+    private void releaseLastSocket(WeakReference<Socket> socket) {
         if (socket != null) {
-            JWebSocketClient so = socket.get();
-            if (so != null && !so.isClosed())
+            Socket so = socket.get();
+            if (so != null && so.isActive())
                 so.close();
             socket.clear();
             Log.e("Socket断开连接。。。。。。");
@@ -372,7 +405,7 @@ public class SocketService extends Service {
     public boolean isServerClose() {
         try {
             if (mSocket != null && mSocket.get() != null) {
-                mSocket.get().sendPing();//发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
+                mSocket.get().send(0);//发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
                 return false;
             }
         } catch (Exception se) {
