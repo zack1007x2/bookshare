@@ -26,4 +26,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.fragment:fragment:1.4.1'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation "org.java-websocket:Java-WebSocket:1.5.3"
 }

@@ -1,6 +1,7 @@
 package com.example.zack.core;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -10,15 +11,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.Toast;
 
+import com.example.zack.Util.MyLog;
 import com.example.zack.common.Custom;
 import com.example.zack.common.SocketServiceSP;
 import com.example.zack.common.Util;
@@ -28,13 +30,8 @@ import com.example.zack.ui.MainActivity;
 import com.example.zack.ui.R;
 import com.example.zack.ui.bean.SocketMessage;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.lang.ref.WeakReference;
-import java.net.Socket;
+import java.net.URI;
 
 import androidx.core.app.NotificationCompat;
 
@@ -44,11 +41,10 @@ import androidx.core.app.NotificationCompat;
  */
 
 public class SocketService extends Service {
-    private final String TAG = SocketService.class.getSimpleName();
     //Service实例，用于在Activity中进行连接断开发消息等图形界面化的操作
 
     //Socket的弱引用
-    private WeakReference<Socket> mSocket;
+    private WeakReference<JWebSocketClient> mSocket;
 
     //消息发出的时间（不管是心跳包还是普通消息，发送完就会跟新时间）
     private long sendTime = 0;
@@ -58,6 +54,7 @@ public class SocketService extends Service {
     private final int MSG_WHAT_DISCONNECT = 112;//断开Socket
     private final int MSG_WHAT_SENDMESSAGE = 113;//发送消息
 
+    private MyLog Log = MyLog.log();
     /**
      * 处理Socket的连接断开发消息的Handler机制
      */
@@ -86,7 +83,7 @@ public class SocketService extends Service {
                         try {
                             SocketService.this.sendMessage(socketMessage);
                         } catch (RemoteException e) {
-                            e.printStackTrace();
+                            Log.e(e);
                         }
                     }
                     break;
@@ -95,7 +92,7 @@ public class SocketService extends Service {
     };
 
     //读取服务器端发来的消息的线程
-    private ReadThread mReadThread;
+//    private ReadThread mReadThread;
 
     //监控服务被杀死重启的广播，保持服务不被杀死
     private BroadcastReceiver restartBR;
@@ -110,13 +107,13 @@ public class SocketService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.e(TAG, "onCreate()");
+        Log.e("onCreate()");
         SocketServiceSP.getInstance(this).saveSocketServiceStatus(true);//保存了Service的开启状态
         //收到Service被杀死的广播，立即重启
         restartBR = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.e(TAG, "SocketServer重启了......");
+                Log.e("SocketServer重启了......");
                 String action = intent.getAction();
                 if (!TextUtils.isEmpty(action) && action.equals("socketService_killed")) ;
                 Intent sIntent = new Intent(SocketService.this, SocketService.class);
@@ -129,7 +126,7 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e(TAG, "onStartCommand(Intent intent, int flags, int startId)");
+        Log.e("onStartCommand(Intent intent, int flags, int startId)");
 //        return super.onStartCommand(intent, flags, startId);
 
         if(isServerClose())
@@ -143,17 +140,39 @@ public class SocketService extends Service {
      */
     public void connectSocket() {
         new Thread(() -> {
-            try {
-                Socket socket = new Socket(Custom.SERVER_HOST, Custom.SERVER_PORT);
-                socket.setSoTimeout(Custom.SOCKET_CONNECT_TIMEOUT * 1000);
-                Log.e(TAG, "Socket连接成功。。。。。。");
-                mSocket = new WeakReference<Socket>(socket);
-                mReadThread = new ReadThread(socket);
-                mReadThread.start();
-                mHandler.postDelayed(activeRunnable, Custom.SOCKET_ACTIVE_TIME * 1000);//开启定时器，定时发送心跳包，保持长连接
-            } catch (IOException e) {
-                e.printStackTrace();
+            URI uri = URI.create("ws://"+Custom.SERVER_HOST+":"+Custom.SERVER_PORT);
+            Log.d(uri.toString());
+            JWebSocketClient socket = new JWebSocketClient(uri){
+                @Override
+                public void onMessage(String message) {
+                    //message就是接收到的消息
+                    Log.e("JWebSClientService: "+ message);
+                    sendNormalNotification(message);
+                }
+            };
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+                NotificationChannel channel = new NotificationChannel(
+                        "zack", "DemoCode", NotificationManager.IMPORTANCE_DEFAULT);
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                assert manager != null;
+                manager.createNotificationChannel(channel);
             }
+
+            try {
+                socket.connectBlocking();
+                Log.d("Socket连接成功。。。。。。");
+                socket.send("hello");
+            } catch (InterruptedException e) {
+                Log.e("Socket连接失敗。。。。。。");
+            }
+//                Socket socket = new Socket(InetAddress.getByName(Custom.SERVER_HOST), Custom.SERVER_PORT);
+//                socket.setSoTimeout(Custom.SOCKET_CONNECT_TIMEOUT * 1000);
+
+            mSocket = new WeakReference<>(socket);
+//            mReadThread = new ReadThread(socket);
+//            mReadThread.start();
+            mHandler.postDelayed(activeRunnable, Custom.SOCKET_ACTIVE_TIME * 1000);//开启定时器，定时发送心跳包，保持长连接
         }).start();
     }
 
@@ -171,13 +190,13 @@ public class SocketService extends Service {
                 message.setTo(Custom.NAME_SERVER);
                 try {
                     if (!sendMessage(message)) {
-                        if (mReadThread != null)
-                            mReadThread.release();
+//                        if (mReadThread != null)
+//                            mReadThread.release();
                         releaseLastSocket(mSocket);
                         connectSocket();
                     }
                 } catch (RemoteException e) {
-                    e.printStackTrace();
+                    Log.e(e);
                 }
             }
             mHandler.postDelayed(this, Custom.SOCKET_ACTIVE_TIME * 1000);
@@ -195,82 +214,83 @@ public class SocketService extends Service {
         if (mSocket == null || mSocket.get() == null) {
             return false;
         }
-        Socket socket = mSocket.get();
-        try {
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            if (!socket.isClosed()) {
-                String jMessage = Util.initJsonObject(message).toString() + "\n";
-                writer.write(jMessage);
-                writer.flush();
-                Log.e(TAG, "发送消息：" + jMessage);
-                sendTime = System.currentTimeMillis();//每次发送成数据，就改一下最后成功发送的时间，节省心跳间隔时间 
-                if (message.getType() == Custom.MESSAGE_EVENT) {//通知实现了消息监听器的界面，让其跟新消息列表
-                    messageListener.updateMessageList(message);
-                }
-            } else {
-                return false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
+        JWebSocketClient socket = mSocket.get();
+        socket.send(Util.initJsonObject(message).toString());
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+//            if (!socket.isClosed()) {
+//                String jMessage = Util.initJsonObject(message).toString() + "\n";
+//                writer.write(jMessage);
+//                writer.flush();
+//                Log.e(TAG, "发送消息：" + jMessage);
+//                sendTime = System.currentTimeMillis();//每次发送成数据，就改一下最后成功发送的时间，节省心跳间隔时间 
+//                if (message.getType() == Custom.MESSAGE_EVENT) {//通知实现了消息监听器的界面，让其跟新消息列表
+//                    messageListener.updateMessageList(message);
+//                }
+//            } else {
+//                return false;
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
         return true;
     }
 
     /**
      * 读取消息的线程
      */
-    class ReadThread extends Thread {
-        private WeakReference<Socket> mReadSocket;
-        private boolean isStart = true;
-
-        public ReadThread(Socket socket) {
-            mReadSocket = new WeakReference<Socket>(socket);
-        }
-
-        public void release() {
-            isStart = false;
-            releaseLastSocket(mReadSocket);
-        }
-
-        @Override
-        public void run() {
-            super.run();
-            Socket socket = mReadSocket.get();
-            if (socket != null && !socket.isClosed()) {
-                try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    while (isStart) {
-                        if (reader.ready()) {
-                            String message = reader.readLine();
-                            Log.e(TAG, "收到消息：" + message);
-                            SocketMessage sMessage = Util.parseJson(message);
-                            if (sMessage.getType() == Custom.MESSAGE_ACTIVE) {//处理心跳回执
-
-                            } else if (sMessage.getType() == Custom.MESSAGE_EVENT) {//事件消息
-                                if (messageListener != null)
-                                    messageListener.updateMessageList(sMessage);
-                                sendNotification(sMessage);
-                            } else if (sMessage.getType() == Custom.MESSAGE_CLOSE) {//断开连接消息回执
-                                mHandler.removeCallbacks(activeRunnable);
-                                release();
-                                releaseLastSocket(mSocket);
-                            }
-                        }
-                        Thread.sleep(100);//每隔0.1秒读取一次，节省点资源
-                    }
-                } catch (IOException e) {
-                    release();
-                    releaseLastSocket(mSocket);
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+//    class ReadThread extends Thread {
+//        private WeakReference<JWebSocketClient> mReadSocket;
+//        private boolean isStart = true;
+//
+//        public ReadThread(JWebSocketClient socket) {
+//            mReadSocket = new WeakReference<JWebSocketClient>(socket);
+//        }
+//
+//        public void release() {
+//            isStart = false;
+//            releaseLastSocket(mReadSocket);
+//        }
+//
+//        @Override
+//        public void run() {
+//            super.run();
+//            JWebSocketClient socket = mReadSocket.get();
+//            if (socket != null && !socket.isClosed()) {
+//                try {
+//                    BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//                    while (isStart) {
+//                        if (reader.ready()) {
+//                            String message = reader.readLine();
+//                            Log.e(TAG, "收到消息：" + message);
+//                            SocketMessage sMessage = Util.parseJson(message);
+//                            if (sMessage.getType() == Custom.MESSAGE_ACTIVE) {//处理心跳回执
+//
+//                            } else if (sMessage.getType() == Custom.MESSAGE_EVENT) {//事件消息
+//                                if (messageListener != null)
+//                                    messageListener.updateMessageList(sMessage);
+//                                sendNotification(sMessage);
+//                            } else if (sMessage.getType() == Custom.MESSAGE_CLOSE) {//断开连接消息回执
+//                                mHandler.removeCallbacks(activeRunnable);
+//                                release();
+//                                releaseLastSocket(mSocket);
+//                            }
+//                        }
+//                        Thread.sleep(100);//每隔0.1秒读取一次，节省点资源
+//                    }
+//                } catch (IOException e) {
+//                    release();
+//                    releaseLastSocket(mSocket);
+//                    e.printStackTrace();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
+//    }
 
 
     //通知的ID，为了分开显示，需要根据Id区分
@@ -314,22 +334,33 @@ public class SocketService extends Service {
         nId++;
     }
 
+    private void sendNormalNotification(String message) {
+        Log.e("sendNormalNotification");
+        NotificationCompat.Builder builder
+                = new NotificationCompat.Builder(SocketService.this,"zack")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle("Sotera！")
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        manager.notify(nId, builder.build());
+        nId++;
+    }
+
     /**
      * 释放Socket，并关闭
      *
      * @param socket
      */
-    private void releaseLastSocket(WeakReference<Socket> socket) {
+    private void releaseLastSocket(WeakReference<JWebSocketClient> socket) {
         if (socket != null) {
-            Socket so = socket.get();
-            try {
-                if (so != null && !so.isClosed())
-                    so.close();
-                socket.clear();
-                Log.e(TAG, "Socket断开连接。。。。。。");
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            JWebSocketClient so = socket.get();
+            if (so != null && !so.isClosed())
+                so.close();
+            socket.clear();
+            Log.e("Socket断开连接。。。。。。");
         }
     }
 
@@ -341,10 +372,11 @@ public class SocketService extends Service {
     public boolean isServerClose() {
         try {
             if (mSocket != null && mSocket.get() != null) {
-                mSocket.get().sendUrgentData(0);//发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
+                mSocket.get().sendPing();//发送1个字节的紧急数据，默认情况下，服务器端没有开启紧急数据处理，不影响正常通信
                 return false;
             }
         } catch (Exception se) {
+            Log.e(se);
             return true;
         }
         return true;
@@ -356,9 +388,9 @@ public class SocketService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.e(TAG, "onDestroy()");
-        if (mReadThread != null)
-            mReadThread.release();
+        Log.e("onDestroy()");
+//        if (mReadThread != null)
+//            mReadThread.release();
         releaseLastSocket(mSocket);
         sendBroadcast(new Intent("socketService_killed"));
         SocketServiceSP.getInstance(SocketService.this).saveSocketServiceStatus(false);
@@ -369,38 +401,35 @@ public class SocketService extends Service {
      * 对外提供的断开Socket连接的方法（向服务器发送断开的包，服务器收到后会与之断开）
      */
     public void interruptSocket() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SocketMessage message = new SocketMessage();
-                message.setType(Custom.MESSAGE_CLOSE);
-                message.setMessage("");
-                message.setFrom(Custom.NAME_CLIENT);
-                message.setTo(Custom.NAME_SERVER);
-                try {
-                    sendMessage(message);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+        new Thread(() -> {
+            SocketMessage message = new SocketMessage();
+            message.setType(Custom.MESSAGE_CLOSE);
+            message.setMessage("");
+            message.setFrom(Custom.NAME_CLIENT);
+            message.setTo(Custom.NAME_SERVER);
+            try {
+                sendMessage(message);
+            } catch (RemoteException e) {
+                Log.e(e);
             }
         }).start();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
-        Log.e(TAG, "onUnbind(Intent intent)");
+        Log.e("onUnbind(Intent intent)");
         return super.onUnbind(intent);
     }
 
     @Override
     public void onRebind(Intent intent) {
-        Log.e(TAG, "onBind(Intent intent)");
+        Log.e("onBind(Intent intent)");
         super.onRebind(intent);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.e(TAG, "onRebind(Intent intent) ");
+        Log.e("onRebind(Intent intent) ");
         return mBinder;
     }
 
@@ -418,7 +447,7 @@ public class SocketService extends Service {
          */
         @Override
         public void connectSocket() throws RemoteException {
-            Log.e(ITAG, "connectSocket");
+            Log.e("connectSocket");
             mHandler.sendEmptyMessage(MSG_WHAT_CONNECT);
         }
 
@@ -428,7 +457,7 @@ public class SocketService extends Service {
          */
         @Override
         public void disConnectSocket() throws RemoteException {
-            Log.e(ITAG, "disConnectSocket");
+            Log.e("disConnectSocket");
             mHandler.sendEmptyMessage(MSG_WHAT_DISCONNECT);
         }
 
@@ -439,7 +468,7 @@ public class SocketService extends Service {
          */
         @Override
         public void sendMessage(SocketMessage message) throws RemoteException {
-            Log.e(ITAG, "sendMessage");
+            Log.e("sendMessage");
             Message msg = Message.obtain();
             msg.what = MSG_WHAT_SENDMESSAGE;
             msg.obj = message;
@@ -453,12 +482,12 @@ public class SocketService extends Service {
          */
         @Override
         public void addMessageListener(ISocketMessageListener listener) throws RemoteException {
-            Log.e(ITAG, "addMessageListener");
+            Log.e("addMessageListener");
             messageListener = listener;
         }
         @Override
         public void removeMessageListener(ISocketMessageListener listener) throws RemoteException {
-            Log.e(ITAG, "removeMessageListener");
+            Log.e("removeMessageListener");
             messageListener = null;
         }
     };
