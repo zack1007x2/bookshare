@@ -193,7 +193,7 @@ public class SocketService extends Service {
             socket.on(Socket.EVENT_CONNECT, onConnect);
             socket.on(Socket.EVENT_DISCONNECT, onDisconnect);
             socket.on(Socket.EVENT_CONNECT_ERROR, onConnectError);
-            socket.on("message", onMessage);
+            socket.on("msg", onMessage);
             socket.connect();
             Log.d("Socket连接成功。。。。。。");
             socket.send("hello");
